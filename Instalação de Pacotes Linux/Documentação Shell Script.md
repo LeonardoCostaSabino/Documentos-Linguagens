@@ -234,18 +234,28 @@ sudo apt-get install "Pacote" #Primeira vez após o login
 apt-get install "Pacote"
 ```
 
-+ Iniciar uma arquivo Shell Script
++ Esperar certos processos
 
 
 ```bash
 #!/bin/bash
+
+sleep "Segundos"
 ```
 
-+ Iniciar uma arquivo Shell Script
++ Here is a list of all comparison operators:
 
 
 ```bash
 #!/bin/bash
+
+-eq – equal to
+-ne – not equal to
+-lt – less than
+-le – less than or equal to
+-gt – greater than
+-ge – greater than or equal to
+
 ```
 
 + Iniciar uma arquivo Shell Script

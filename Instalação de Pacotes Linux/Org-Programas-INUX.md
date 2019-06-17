@@ -22,9 +22,6 @@
 
 + *VSCODE* - O Visual Studio Code é um editor de código-fonte desenvolvido pela Microsoft para Windows, Linux e macOS.
 
-+ TRAMISSION
-
-+ PHP -
 
 ## Processos obrigatórios
 

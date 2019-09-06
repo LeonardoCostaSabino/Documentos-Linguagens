@@ -30,7 +30,6 @@ case $opcao in
       PROGRAMAS[0]=" ====================\n";
       PROGRAMAS[1]=" |Git            | - Programa de Controle de Versão\n";
       PROGRAMAS[2]=" |Snap           | - Programa de Auxilio de instalação de Programas\n";
-      PROGRAMAS[3]=" |Shell-Zsh      | - Shell mais interativo com o usuário e permite persinalização \n";
       PROGRAMAS[4]=" |Docker         | - Programa de Criaçaõ de ambiente de desenvolvimento\n";
       PROGRAMAS[5]=" |Docker-Compose | - Programa de extensão ao Docker\n";
       PROGRAMAS[6]=" |Gimp           | - Programa de ediçaõ de Imagem \n";
@@ -83,56 +82,20 @@ case $opcao in
         ERROR[1]=" Snap,"
       fi
 
-      #Instalando o Shell ZSH e o Framework oh-my-ZSH
-
-      if sudo apt-get install zsh -y &&
-         sh -c "$(curl -fsSL https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh)" &&
-         git clone https://github.com/zsh-users/zsh-autosuggestions "${ZSH_CUSTOM:-~/.oh-my-zsh/custom}"/plugins/zsh-autosuggestions &&
-         git clone https://github.com/zsh-users/zsh-syntax-highlighting.git "${ZSH_CUSTOM:-~/.oh-my-zsh/custom}"/plugins/zsh-syntax-highlighting
-        then
-          FINISH[4]="Instalação do ZSH foi finalizada com Sucesso!!!\n"
-        else
-          echo "Não foi possível instalar o Shell do ZSH"
-          echo "Por favor revise seu comando"
-          ERROR[2]=" Shell Zsh,"
-        fi
-
       #Instalando o programa Docker
 
       if sudo apt-get update &&
-         sudo apt-get -y install apt-transport-https ca-certificates curl software-properties-common-y &&
-         curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+         sudo apt-get install -y docker.io &&
+         sudo usermod -aG docker "$USER" && # Comando para deixar o docker sem sudo -y
+         sudo curl -L "https://github.com/docker/compose/releases/download/1.23.1/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose &&
+         sudo chmod +x /usr/local/bin/docker-compose &&
+         docker-compose --version
       then
-        read -r finger
-        if sudo apt-key fingerprint "$finger"
-          then
-            if sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(. /etc/os-release; echo "$UBUNTU_CODENAME") stable" &&
-               sudo apt-get update &&
-               sudo apt-get install docker-ce docker-ce-cli containerd.io -y &&
-               sudo usermod -aG docker "$(whoami)" # Comando para deixar o docker sem sudo -y
-            then
-              FINISH[5]="Instalação do Docker foi finalizada com Sucesso!!!\n"
-            else
-              ERROR[3]=" Docker,"
-            fi
-          else
-            ERROR[3]=" Docker{Chave de Acesso},"
-        fi
-        else
+          FINISH[5]="Instalação do Docker foi finalizada com Sucesso!!!\n"
+      else
           ERROR[3]=" Docker,"
       fi
-
-      #Instalando Docker-compose
-
-      if sudo curl -L "https://github.com/docker/compose/releases/download/1.24.1/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose -y &&
-         sudo chmod +x /usr/local/bin/docker-compose -y
-        then
-          FINISH[6]="Instalação do Docker-Compose foi finalizada com Sucesso!!!\n"
-        else
-          ERROR[4]=" Docker-Compose,"
-      fi
-
-      #Instalando o Gimp
+      Instalando o Gimp
 
       if sudo add-apt-repository ppa:otto-kesselgulasch/gimp -y &&
          sudo apt-get update &&
@@ -157,7 +120,7 @@ case $opcao in
       #Instalando o programa Google Chorome
 
       if wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb &&
-         sudo gdebi google-chrome-stable_current_amd64.deb -y
+         sudo gdebi google-chrome-stable_current_amd64.deb
       then
         FINISH[9]="Instalação do Google Chorome foi finalizada com Sucesso!!!\n"
       else
@@ -192,7 +155,7 @@ case $opcao in
         ERROR[9]=" Cream,"
       fi
 
-      #Finalizou todas as instalações
+      Finalizou todas as instalações
 
       echo -e "${FINISH[*]}";
 
@@ -234,50 +197,47 @@ case $opcao in
 
             read -r language;
 
-            while $language === '0'
-            do
-            read -r language
-            if [ -z "$language" ]; then
-                echo "ERRO: digite uma das opções definidas!!"
+            if [ -z "$language" ]
+            then
+                echo -e "ERRO: digite uma das opções definidas!!"
+                echo -e "Digite novamente um opção\n"
+                read -r language
             fi
-            done
 
-            if wget https://download.jetbrains.com/webide/PhpStorm-2019.2.tar.gz -O phpstorm.tar.gz &&
+            case $language in
+
+            1)
+              if wget https://download.jetbrains.com/webide/PhpStorm-2019.2.tar.gz -O phpstorm.tar.gz &&
                sudo tar vzxf phpstorm.tar.gz -C /opt/ &&
                sudo mv /opt/PhpStorm*/ /opt/phpstorm &&
                sudo ln -sf /opt/phpstorm/bin/phpstorm.sh /usr/bin/phpstorm &&
                echo -e '[Desktop Entry]\n Version=1.0\n Name=phpstorm\n Exec=/opt/phpstorm/bin/phpstorm.sh\n Icon=/opt/phpstorm/bin/phpstorm.png\n Type=Application\n Categories=Application' | sudo tee /usr/share/applications/phpstorm.desktop &&
                sudo chmod +x /usr/share/applications/phpstorm.desktop
+               cp /usr/share/applications/phpstorm.desktop ~/Desktop #Em Ingles
               then
-                if "$language" == '1'
-                  then
-                    if cp /usr/share/applications/phpstorm.desktop ~/Desktop #Em Ingles
-                      then
-                        echo -e 'Parabens o PHPSTORM foi instalado com sucesso!!!\n';
-                      else
-                        echo -e 'Houve um erro durante a instalação\n';
-                    fi
-                  else
-                    if "$language" == '2'
-                      then
-                        if cp /usr/share/applications/phpstorm.desktop  ~/Área\ de\ Trabalho/ #Em Português
-                          then
-                            echo -e 'Parabens o PHPSTORM foi instalado com sucesso!!!\n';
-                          else
-                            echo -e 'Houve um erro durante a instalação\n';
-                        fi
-                      else
-                        exit;
-                    fi
-                  fi
-                  else
-                    echo -e 'Houve um erro durante a instalação\n';
-                fi
+                echo -e 'Parabens o PHPSTORM foi instalado com sucesso!!!\n';
+              else
+                echo -e 'Houve um erro durante a instalação\n';
+              fi
+              ;;
+            2)
+              if wget https://download.jetbrains.com/webide/PhpStorm-2019.2.tar.gz -O phpstorm.tar.gz &&
+               sudo tar vzxf phpstorm.tar.gz -C /opt/ &&
+               sudo mv /opt/PhpStorm*/ /opt/phpstorm &&
+               sudo ln -sf /opt/phpstorm/bin/phpstorm.sh /usr/bin/phpstorm &&
+               echo -e '[Desktop Entry]\n Version=1.0\n Name=phpstorm\n Exec=/opt/phpstorm/bin/phpstorm.sh\n Icon=/opt/phpstorm/bin/phpstorm.png\n Type=Application\n Categories=Application' | sudo tee /usr/share/applications/phpstorm.desktop &&
+               sudo chmod +x /usr/share/applications/phpstorm.desktop
+               cp /usr/share/applications/phpstorm.desktop  ~/Área\ de\ Trabalho/ #Em Português
+              then
+                echo -e 'Parabens o PHPSTORM foi instalado com sucesso!!!\n';
+              else
+                echo -e 'Houve um erro durante a instalação\n';
+              fi
+              ;;
+            esac
             ;;
           2)
-            if curl https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > microsoft.gpg &&
-               sudo install -o root -g root -m 644 microsoft.gpg /etc/apt/trusted.gpg.d/ &&
-               sudo sh -c 'echo "deb [arch=amd64] https://packages.microsoft.com/repos/vscode stable main" > /etc/apt/sources.list.d/vscode.list'
+            if sudo snap install code --classic
             then
               echo -e 'Parabens o VISUAL CODE STUDIO foi instalado com sucesso!!!\n';
             else
@@ -445,9 +405,9 @@ case $opcao in
             sudo apt update &&
             sudo apt-get install php7.3 &&
             php -v &&
-            sudo apt install php7.3-cli php7.3-json php7.3-pdo php7.3-mysql php7.3-zip php7.3-gd php7.3-mbstring php7.3-curl php7.3-xml php7.3-bcmath &&
+            sudo apt install -y php7.3-cli php7.3-json php7.3-pdo php7.3-mysql php7.3-zip php7.3-gd php7.3-mbstring php7.3-curl php7.3-xml php7.3-bcmath &&
             apt policy php7.3-gd &&
-            sudo apt install php7.3-fpm
+            sudo apt install -y php7.3-fpm
             then
               echo -e 'Parabens o PHP foi instalado com sucesso!!!\n';
             else
@@ -456,7 +416,7 @@ case $opcao in
             ;;
           3)
             if sudo apt update &&
-            sudo apt install curl php-cli php-mbstring git unzip &&
+            sudo apt install -y curl php-cli php-mbstring git unzip &&
             curl -sS https://getcomposer.org/installer -o composer-setup.php &&
             echo -e "Digite o Hash!! https://composer.github.io/pubkeys.html\n" &&
             read -r hash &&
@@ -475,12 +435,11 @@ case $opcao in
             echo -e "Será instalado nesta etapa no Node.js com seus gerenciadores de bibliotecas: NPM e YARN"
             sleep 5;
 
-            if sudo apt-get install curl python-software-properties &&
-            curl -sL https://deb.nodesource.com/setup_12.x | sudo bash - &&
-            sudo apt-get install nodejs &&
+            if sudo apt-get install -y curl python-software-properties &&
+            sudo apt-get install -y nodejs npm &&
             node -v &&
             npm -v &&
-            sudo npm install yarn -g &&
+            sudo npm install -y yarn -g &&
             yarn -v
             then
               echo -e 'Parabens o NODE.js foi instalado com sucesso!!!\n';
@@ -490,7 +449,7 @@ case $opcao in
             ;;
           5)
             if sudo apt-get update &&
-            sudo apt-get install apache2
+            sudo apt-get install -y apache2
             then
               echo -e 'Parabens o APACHE foi instalado com sucesso!!!\n';
             else
@@ -499,7 +458,7 @@ case $opcao in
             ;;
           6)
             if sudo apt update &&
-            sudo apt install nginx &&
+            sudo apt install -y nginx &&
             sudo systemctl status nginx
             then
               echo -e 'Parabens o NGINX foi instalado com sucesso!!!\n';
@@ -510,7 +469,7 @@ case $opcao in
           7)
             if sudo add-apt-repository ppa:deadsnakes/ppa &&
             sudo apt-get update &&
-            sudo apt-get install python3.7
+            sudo apt-get install -y python3.7
             then
               echo -e 'Parabens o PHYTHON foi instalado com sucesso!!!\n';
             else
@@ -527,22 +486,22 @@ case $opcao in
       # Colocar os Containers testados e finalizados do Git para cá
     ;;
     6)
-      if zsh
-      then
         echo "Todas as instalações foram finalizadas deseja configurar o ZSH? (Y/N)"
         read -r Configs
         if [ "$Configs" == "Y" ] || [ "$Configs" == "y" ]
           then
-            echo -e "Copie esses codigos para o Arquivo que será aberto!!\n"
-            echo -e "plugins=(git zsh-autosuggestions zsh-syntax-highlighting)\n"
-            echo -e "(composer,copyfile,dirhistory,django,docker,extract,git,ng,node,npm,python,sudo)\n"
-            echo -e "#ZSH_THEME='blinks' (agnoster ou blinks ou pygmalion ou wezm)\n"
+            sudo apt-get install zsh -y &&
+            git clone https://github.com/zsh-users/zsh-autosuggestions "${ZSH_CUSTOM:-~/.oh-my-zsh/custom}"/plugins/zsh-autosuggestions &&
+            git clone https://github.com/zsh-users/zsh-syntax-highlighting.git "${ZSH_CUSTOM:-~/.oh-my-zsh/custom}"/plugins/zsh-syntax-highlighting &&
+            echo -e "Copie esses codigos para o Arquivo que será aberto!!\n" &&
+            echo -e "plugins=(git zsh-autosuggestions zsh-syntax-highlighting)\n" &&
+            echo -e "(composer,copyfile,dirhistory,django,docker,extract,git,ng,node,npm,python,sudo)\n" &&
+            echo -e "#ZSH_THEME='blinks' (agnoster ou blinks ou pygmalion ou wezm)\n" &&
             cream ~/.zshrc
           else
             echo ""
             break;
         fi
-      fi
     ;;
     7)
       cream ./Org-Programas-INUX.md
